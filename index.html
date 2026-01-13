@@ -8,7 +8,6 @@
 /* ================= RESET ================= */
 html, body { margin:0; padding:0; height:100%; overflow:hidden; font-family:Arial; background:#f6f6f6; }
 
-/* ================= HEADER ================= */
 .topbar { position:fixed; top:0; left:0; right:0; background:#fff; padding:10px; z-index:20; box-shadow:0 2px 6px rgba(0,0,0,.05); display:flex; flex-direction:column; }
 .topbar-row1 { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
 .logo { font-size:18px; font-weight:bold; }
@@ -25,14 +24,8 @@ html, body { margin:0; padding:0; height:100%; overflow:hidden; font-family:Aria
 .cat-wrap { position:fixed; top:90px; left:0; right:0; display:flex; gap:8px; padding:8px 10px; background:#fff; overflow-x:auto; z-index:19; }
 .cat { padding:6px 14px; border-radius:999px; background:#eee; font-size:13px; white-space:nowrap; cursor:pointer; flex-shrink:0; }
 .cat.active { background:#0a7cff; color:#fff; }
-
-/* ================= JUDUL KATEGORI ================= */
 .cat-title { position:fixed; top:135px; left:0; right:0; background:#f6f6f6; padding:8px 10px; font-weight:bold; font-size:14px; z-index:18; }
-
-/* ================= SCROLL PRODUK ================= */
 .product-scroll { position:fixed; top:170px; left:0; right:0; bottom:0; overflow-y:auto; -webkit-overflow-scrolling:touch; }
-
-/* ================= GRID ================= */
 .product-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; padding:10px; box-sizing:border-box; }
 .card { background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,.06); cursor:pointer; }
 .card img { width:100%; height:160px; object-fit:cover; }
@@ -43,8 +36,6 @@ html, body { margin:0; padding:0; height:100%; overflow:hidden; font-family:Aria
 .p-sold { font-size:11px; color:gray; }
 .buy-btn { margin-top:6px; padding:7px; background:#0a7cff; color:#fff; text-align:center; border-radius:6px; font-size:12px; transition:0.15s; }
 .buy-btn:active { transform:scale(0.95); opacity:0.8; }
-
-/* ================= DARK MODE ================= */
 body.dark { background:#121212; color:#e0e0e0; }
 body.dark .topbar { background:#1e1e1e; color:#e0e0e0; }
 body.dark #search { background:#2a2a2a; border:1px solid #444; color:#e0e0e0; }
@@ -55,8 +46,6 @@ body.dark .cat-title { background:#121212; color:#e0e0e0; }
 body.dark .product-grid .card { background:#1e1e1e; box-shadow:0 2px 6px rgba(0,0,0,.4); }
 body.dark .p-cat { color:#0a7cff; }
 body.dark .p-name, body.dark .p-price, body.dark .p-sold { color:#e0e0e0; }
-
-/* ================= DETAIL OVERLAY ================= */
 #detailPage { position:fixed; top:0; left:0; right:0; bottom:0; background:#fff; z-index:50; display:none; overflow-y:auto; -webkit-overflow-scrolling:touch; opacity:0; transform:translateY(20px); transition:0.25s; }
 #detailPage.page { display:block; opacity:1; transform:translateY(0); }
 #detailPage.page-exit { opacity:0; transform:translateY(20px); }
@@ -81,14 +70,13 @@ body.detail-open { overflow:hidden; }
   </head>
   <body class="page">
 
-    <!-- ================= HOME PAGE ================= -->
     <div id="homePage">
 
       <div class="topbar">
         <div class="topbar-row1">
           <div class="logo">NF STORE</div>
           <div class="dark-switch-wrapper">
-            <span id="darkModeIcon">🌙</span>
+            <span id="darkModeIcon">🙂</span>
             <div class="switch" id="darkSwitch">
               <div class="slider"></div>
             </div>
