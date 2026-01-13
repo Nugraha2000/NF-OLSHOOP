@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Olshop SPA</title>
+<style>
+/* ================= RESET ================= */
+html, body { margin:0; padding:0; height:100%; overflow:hidden; font-family:Arial; background:#f6f6f6; }
+
+/* ================= HEADER ================= */
+.topbar { position:fixed; top:0; left:0; right:0; background:#fff; padding:10px; z-index:20; box-shadow:0 2px 6px rgba(0,0,0,.05); display:flex; flex-direction:column; }
+.topbar-row1 { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+.logo { font-size:18px; font-weight:bold; }
+.dark-switch-wrapper { display:flex; align-items:center; gap:6px; }
+#darkModeIcon { font-size:18px; }
+.switch { width:42px; height:24px; background:#ccc; border-radius:24px; position:relative; cursor:pointer; transition: background 0.3s; }
+.switch .slider { width:18px; height:18px; background:#fff; border-radius:50%; position:absolute; top:3px; left:3px; transition:0.3s; }
+.switch.on { background:#0a7cff; }
+.switch.on .slider { transform:translateX(18px); }
+.topbar-row2 { display:flex; }
+#search { flex:1; padding:10px; border-radius:8px; border:1px solid #ddd; box-sizing:border-box; }
+
+/* ================= KATEGORI ================= */
+.cat-wrap { position:fixed; top:90px; left:0; right:0; display:flex; gap:8px; padding:8px 10px; background:#fff; overflow-x:auto; z-index:19; }
+.cat { padding:6px 14px; border-radius:999px; background:#eee; font-size:13px; white-space:nowrap; cursor:pointer; flex-shrink:0; }
+.cat.active { background:#0a7cff; color:#fff; }
+
+/* ================= JUDUL KATEGORI ================= */
+.cat-title { position:fixed; top:135px; left:0; right:0; background:#f6f6f6; padding:8px 10px; font-weight:bold; font-size:14px; z-index:18; }
+
+/* ================= SCROLL PRODUK ================= */
+.product-scroll { position:fixed; top:170px; left:0; right:0; bottom:0; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+
+/* ================= GRID ================= */
+.product-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; padding:10px; box-sizing:border-box; }
+.card { background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,.06); cursor:pointer; }
+.card img { width:100%; height:160px; object-fit:cover; }
+.card-body { padding:8px; }
+.p-cat { font-size:11px; color:#0a7cff; }
+.p-name { font-size:13px; height:32px; overflow:hidden; }
+.p-price { font-weight:bold; margin-top:4px; }
+.p-sold { font-size:11px; color:gray; }
+.buy-btn { margin-top:6px; padding:7px; background:#0a7cff; color:#fff; text-align:center; border-radius:6px; font-size:12px; transition:0.15s; }
+.buy-btn:active { transform:scale(0.95); opacity:0.8; }
+
+/* ================= DARK MODE ================= */
+body.dark { background:#121212; color:#e0e0e0; }
+body.dark .topbar { background:#1e1e1e; color:#e0e0e0; }
+body.dark #search { background:#2a2a2a; border:1px solid #444; color:#e0e0e0; }
+body.dark .cat-wrap { background:#1e1e1e; }
+body.dark .cat { background:#333; color:#ccc; }
+body.dark .cat.active { background:#0a7cff; color:#fff; }
+body.dark .cat-title { background:#121212; color:#e0e0e0; }
+body.dark .product-grid .card { background:#1e1e1e; box-shadow:0 2px 6px rgba(0,0,0,.4); }
+body.dark .p-cat { color:#0a7cff; }
+body.dark .p-name, body.dark .p-price, body.dark .p-sold { color:#e0e0e0; }
+
+/* ================= DETAIL OVERLAY ================= */
+#detailPage { position:fixed; top:0; left:0; right:0; bottom:0; background:#fff; z-index:50; display:none; overflow-y:auto; -webkit-overflow-scrolling:touch; opacity:0; transform:translateY(20px); transition:0.25s; }
+#detailPage.page { display:block; opacity:1; transform:translateY(0); }
+#detailPage.page-exit { opacity:0; transform:translateY(20px); }
+body.detail-open { overflow:hidden; }
+.detail-header { display:flex; align-items:center; padding:10px; border-bottom:1px solid #ddd; position:sticky; top:0; background:#fff; z-index:10; }
+.back-btn { cursor:pointer; font-size:18px; margin-right:10px; }
+.detail-title { font-weight:bold; }
+.detail-content { display:flex; flex-direction:column; padding:10px; }
+.d-img { width:100%; max-height:250px; object-fit:cover; border-radius:10px; margin-bottom:10px; }
+.d-box { display:flex; flex-direction:column; gap:6px; }
+.d-name { font-weight:bold; font-size:16px; }
+.d-price { color:#0a7cff; font-weight:bold; font-size:15px; }
+.d-info { font-size:12px; color:gray; }
+.d-var-title { font-size:13px; margin-bottom:4px; }
+.d-var button { margin:2px; padding:6px 12px; border-radius:6px; border:1px solid #ccc; background:#eee; cursor:pointer; }
+.d-var button.active { background:#0a7cff; color:#fff; border:none; }
+.buy-bar { padding:10px; }
+.buy-bar .buy-btn { width:100%; padding:10px; background:#0a7cff; color:#fff; border-radius:8px; text-align:center; font-weight:bold; cursor:pointer; transition:0.15s; }
+.buy-bar .buy-btn:active { transform:scale(0.95); opacity:0.8; }
+.card, .buy-btn { -webkit-tap-highlight-color: transparent; user-select:none; }
+</style>
+  </head>
+  <body class="page">
+
+    <!-- ================= HOME PAGE ================= -->
+    <div id="homePage">
+
+      <div class="topbar">
+        <div class="topbar-row1">
+          <div class="logo">NF STORE</div>
+          <div class="dark-switch-wrapper">
+            <span id="darkModeIcon">🌙</span>
+            <div class="switch" id="darkSwitch">
+              <div class="slider"></div>
+            </div>
+          </div>
+        </div>
+        <div class="topbar-row2">
+          <input type="text" id="search" placeholder="Cari produk...">
+        </div>
+      </div>
+
+      <div class="cat-wrap">
+        <div class="cat active" onclick="filterCat('all',this)">Semua</div>
+        <div class="cat" onclick="filterCat('makanan',this)">Makanan</div>
+        <div class="cat" onclick="filterCat('baju',this)">Baju</div>
+        <div class="cat" onclick="filterCat('topi',this)">Topi</div>
+        <div class="cat" onclick="filterCat('kecantikan',this)">Kecantikan</div>
+      </div>
+
+      <div class="cat-title" id="cat-title">Semua Produk</div>
+
+      <div class="product-scroll">
+        <div id="produk" class="product-grid"></div>
+      </div>
+    </div>
+
+    <!-- ================= DETAIL PAGE ================= -->
+    <div id="detailPage">
+      <div class="detail-header">
+        <span class="back-btn" onclick="closeDetail()">✕</span>
+        <span class="detail-title">Detail Produk</span>
+      </div>
+      <div class="detail-content">
+        <img id="d-img" class="d-img">
+        <div class="d-box">
+          <div id="d-name" class="d-name"></div>
+          <div id="d-price" class="d-price"></div>
+          <div id="d-info" class="d-info"></div>
+          <div class="d-var">
+            <div class="d-var-title">Pilih Varian</div>
+            <div id="varian"></div>
+          </div>
+        </div>
+      </div>
+      <div class="buy-bar">
+        <div id="buy" class="buy-btn">Beli Sekarang</div>
+      </div>
+    </div>
+
+<script>
+// DATA PRODUK
+var data = [
+  {id:"1",nama:"Basreng Pedas Gurih",kategori:"makanan",harga:"75.000",stok:20,terjual:120,gambar:"https://via.placeholder.com/400",varian:["Original","Pedas","Extra Pedas"]},
+  {id:"2",nama:"Basreng Balado",kategori:"makanan",harga:"70.000",stok:18,terjual:95,gambar:"https://via.placeholder.com/400",varian:["Original","Pedas"]},
+  {id:"3",nama:"Keripik Singkong Pedas",kategori:"makanan",harga:"45.000",stok:30,terjual:210,gambar:"https://via.placeholder.com/400",varian:["Level 1","Level 3","Level 5"]},
+  {id:"4",nama:"Kaos Polos Premium",kategori:"baju",harga:"155.000",stok:15,terjual:300,gambar:"https://via.placeholder.com/400",varian:["S","M","L","XL"]},
+  {id:"5",nama:"Hoodie Polos Unisex",kategori:"baju",harga:"275.000",stok:10,terjual:140,gambar:"https://via.placeholder.com/400",varian:["M","L","XL"]},
+  {id:"6",nama:"Kemeja Flanel",kategori:"baju",harga:"185.000",stok:12,gambar:"https://via.placeholder.com/400",varian:["M","L","XL"]},
+  {id:"7",nama:"Topi Adidas Original",kategori:"topi",harga:"115.000",stok:15,terjual:300,gambar:"https://via.placeholder.com/400",varian:["All Size"]},
+  {id:"8",nama:"Topi Snapback Hitam",kategori:"topi",harga:"95.000",stok:20,terjual:170,gambar:"https://via.placeholder.com/400",varian:["All Size"]},
+  {id:"9",nama:"Topi Trucker",kategori:"topi",harga:"85.000",stok:25,terjual:90,gambar:"https://via.placeholder.com/400",varian:["All Size"]},
+  {id:"10",nama:"Body Lotion Whitening",kategori:"kecantikan",harga:"45.000",stok:40,terjual:260,gambar:"https://via.placeholder.com/400",varian:["100ml","200ml"]},
+  {id:"11",nama:"Facial Wash Acne",kategori:"kecantikan",harga:"35.000",stok:35,terjual:190,gambar:"https://via.placeholder.com/400",varian:["Normal","Acne"]},
+  {id:"12",nama:"Bedak Padat Natural",kategori:"kecantikan",harga:"55.000",stok:22,terjual:145,gambar:"https://via.placeholder.com/400",varian:["Natural","Ivory","Beige"]}
+];
+
+let cat="all", pilihVarian="";
+
+// RENDER PRODUK
+function render(){
+  const list=document.getElementById("produk");
+  if(!list) return;
+  list.innerHTML="";
+  const q=document.getElementById("search").value.toLowerCase();
+  data.forEach(p=>{
+    if(cat!=="all" && p.kategori!==cat) return;
+    if(p.nama.toLowerCase().indexOf(q)===-1) return;
+    const card=document.createElement("div");
+    card.className="card";
+    card.innerHTML=`
+      <img src="${p.gambar}">
+      <div class="card-body">
+        <div class="p-cat">${p.kategori}</div>
+        <div class="p-name">${p.nama}</div>
+        <div class="p-price">Rp ${p.harga}</div>
+        <div class="p-sold">Terjual ${p.terjual}</div>
+        <div class="buy-btn">Beli</div>
+      </div>
+    `;
+    card.addEventListener('click', ev=>{
+      if(!ev.target.classList.contains('buy-btn')) openDetail(p.id);
+    });
+    const buyBtn=card.querySelector('.buy-btn');
+    buyBtn.addEventListener('click', ev=>{
+      ev.stopPropagation();
+      openDetail(p.id);
+    });
+    list.appendChild(card);
+  });
+}
+
+// FILTER
+function filterCat(c, el){
+  cat=c;
+  document.getElementById("cat-title").innerText=c==="all"?"Semua Produk":"Kategori: "+c;
+  document.querySelectorAll(".cat").forEach(catEl=>catEl.classList.remove("active"));
+  el.classList.add("active");
+  render();
+}
+
+// DETAIL
+function openDetail(id){
+  const p=data.find(x=>x.id==id);
+  if(!p) return;
+  pilihVarian="";
+  document.getElementById("d-img").src=p.gambar;
+  document.getElementById("d-name").innerText=p.nama;
+  document.getElementById("d-price").innerText="Rp "+p.harga;
+  document.getElementById("d-info").innerText="Stok "+p.stok+" | Terjual "+p.terjual;
+  const v=document.getElementById("varian");
+  v.innerHTML="";
+  p.varian.forEach(x=>{
+    const b=document.createElement("button");
+    b.innerText=x;
+    b.onclick=()=>{
+      document.querySelectorAll(".d-var button").forEach(btn=>btn.classList.remove("active"));
+      b.classList.add("active");
+      pilihVarian=x;
+    };
+    v.appendChild(b);
+  });
+  const detailPage=document.getElementById("detailPage");
+  detailPage.style.display="block";
+  document.body.classList.add("detail-open");
+  detailPage.classList.remove("page-exit");
+  detailPage.classList.add("page");
+  history.pushState({detailOpen:true},"");
+}
+
+function closeDetail(){
+  const detailPage=document.getElementById("detailPage");
+  detailPage.classList.add("page-exit");
+  setTimeout(()=>{
+    detailPage.style.display="none";
+    document.body.classList.remove("detail-open");
+    detailPage.classList.remove("page-exit");
+  },200);
+}
+
+// BUY SEKARANG PAKAI BIT.LY
+document.getElementById("buy").onclick=function(){
+  if(!pilihVarian){ alert("Pilih varian dulu"); return; }
+  const name=document.getElementById("d-name").innerText;
+  const waLink = "https://bit.ly/3NjGU9t"; // link Bit.ly
+  const pesan = encodeURIComponent("Beli "+name+" Varian "+pilihVarian);
+  const finalLink = waLink + "?text=" + pesan;
+  window.open(finalLink, "_blank");
+};
+
+// SEARCH
+const s=document.getElementById("search");
+if(s) s.onkeyup=render;
+
+// BACK BUTTON
+window.onpopstate=function(){
+  const detailPage=document.getElementById("detailPage");
+  if(detailPage.style.display==="block") closeDetail();
+};
+
+// DARK MODE
+let darkMode=true;
+const darkSwitch=document.getElementById("darkSwitch");
+const darkIcon=document.getElementById("darkModeIcon");
+
+function updateDarkMode(){
+  if(darkMode){
+    document.body.classList.add("dark");
+    darkSwitch.classList.add("on");
+    darkIcon.textContent="☀️";
+  } else {
+    document.body.classList.remove("dark");
+    darkSwitch.classList.remove("on");
+    darkIcon.textContent="🌙";
+  }
+}
+darkSwitch.addEventListener('click', ()=>{
+  darkMode=!darkMode;
+  updateDarkMode();
+});
+
+// INIT
+render();
+updateDarkMode();
+</script>
+  </body>
+</html>
